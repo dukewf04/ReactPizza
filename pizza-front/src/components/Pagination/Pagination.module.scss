@@ -1,0 +1,35 @@
+@import '../../scss/variables';
+
+.root {
+  li {
+    display: inline-block;
+
+    a {
+      display: inline-block;
+      text-align: center;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      border: 1px solid $orange;
+      border-radius: 30px;
+      margin-right: 10px;
+      color: $orange;
+      cursor: pointer;
+      border-radius: $border-radius;
+
+      &:hover {
+        background-color: $orange;
+        color: #fff !important;
+      }
+    }
+  }
+
+  :global {
+    .selected {
+      a {
+        background-color: $orange;
+        color: #fff;
+      }
+    }
+  }
+}

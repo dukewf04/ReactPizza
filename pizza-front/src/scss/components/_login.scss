@@ -1,0 +1,19 @@
+/* ---------- SIGN IN ---------- */
+.sign-in__wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 999;
+}
+
+.sign-in__wrapper form {
+  width: 24rem;
+  max-width: 90%;
+  z-index: 1;
+}
+
+.sign-in__wrapper form img {
+  width: 4rem;
+}

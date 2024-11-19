@@ -1,0 +1,13 @@
+database:
+  db_type: "postgresql"
+  db_driver: "asyncpg"
+  db_host: "localhost"
+  db_port: 5432
+  db_name: "db_pizza"
+  db_user: "postgres"
+  db_password: "postgres"
+auth:
+  secret_key: gV64m9aIzFG4qpgVphvQbPQrtAO0nM-7YwwOvu0XPt5KJOjAy4AfgLkqJXYEt
+  algorithm: HS256
+  jwt_expire_minutes: 300
+user:

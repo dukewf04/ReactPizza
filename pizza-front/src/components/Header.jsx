@@ -1,0 +1,112 @@
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import logoSvg from '../assets/img/pizza-logo.svg';
+import Search from './Search';
+import { useSelector } from 'react-redux';
+import { selectCart } from '../redux/slices/cartSlice';
+import Navbar from 'react-bootstrap/Navbar';
+import { useState } from 'react';
+import ModalLogin from './ModalLogin/ModalLogin';
+import UserAuth from '../services/userAuth/userAuth';
+import { DoorClosed } from 'react-bootstrap-icons';
+
+function Header() {
+  const [showModal, setShowModal] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { items, totalPrice } = useSelector(selectCart);
+  const totalCountPizzas = items.reduce((sum, obj) => {
+    return (sum += obj.count);
+  }, 0);
+
+  // Проверяем авторизован ли пользователь
+  const user = new UserAuth();
+  const userName = user.getDecodedData() ? user.getDecodedData().username : null;
+
+  const handleLogout = async () => {
+    user.deleteCookie();
+    navigate('/');
+  };
+
+  return (
+    <>
+      <Navbar className="bg-white header">
+        <div className="header__auth">
+          {userName ? (
+            <>
+              <Link to={'/profile'}>
+                <div className="mt-1">{userName}</div>
+              </Link>
+              &nbsp;&nbsp;
+              <div>
+                <DoorClosed
+                  title="Выйти"
+                  size={20}
+                  color="#fe5f1e"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    handleLogout();
+                  }}
+                />
+              </div>
+            </>
+          ) : (
+            <div onClick={() => setShowModal(true)}>Войти</div>
+          )}
+        </div>
+        <div className="container">
+          <Link to="/">
+            <div className="header__logo">
+              <img width="38" src={logoSvg} alt="Pizza logo" />
+              <div>
+                <h1>Crazy Pizza</h1>
+                <p>Пицца, которая вас удивит!</p>
+              </div>
+            </div>
+          </Link>
+          {location.pathname === '/' && <Search />}
+          <div className="header__cart">
+            <Link to="/cart" className="button button--cart">
+              <span>{totalPrice} ₽</span>
+              <div className="button__delimiter"></div>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M6.33333 16.3333C7.06971 16.3333 7.66667 15.7364 7.66667 15C7.66667 14.2636 7.06971 13.6667 6.33333 13.6667C5.59695 13.6667 5 14.2636 5 15C5 15.7364 5.59695 16.3333 6.33333 16.3333Z"
+                  stroke="white"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M14.3333 16.3333C15.0697 16.3333 15.6667 15.7364 15.6667 15C15.6667 14.2636 15.0697 13.6667 14.3333 13.6667C13.597 13.6667 13 14.2636 13 15C13 15.7364 13.597 16.3333 14.3333 16.3333Z"
+                  stroke="white"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M4.78002 4.99999H16.3334L15.2134 10.5933C15.1524 10.9003 14.9854 11.176 14.7417 11.3722C14.4979 11.5684 14.1929 11.6727 13.88 11.6667H6.83335C6.50781 11.6694 6.1925 11.553 5.94689 11.3393C5.70128 11.1256 5.54233 10.8295 5.50002 10.5067L4.48669 2.82666C4.44466 2.50615 4.28764 2.21182 4.04482 1.99844C3.80201 1.78505 3.48994 1.66715 3.16669 1.66666H1.66669"
+                  stroke="white"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>{totalCountPizzas}</span>
+            </Link>
+          </div>
+        </div>
+      </Navbar>
+
+      {/* Модальное окно с авторизацией/регистрацией */}
+      {showModal && <ModalLogin showModal={showModal} setShowModal={setShowModal} />}
+    </>
+  );
+}
+
+export default Header;
