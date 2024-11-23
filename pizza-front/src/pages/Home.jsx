@@ -10,7 +10,7 @@ import { fetchPizzas } from '../redux/slices/pizzaSlice';
 
 const Home = () => {
   const dispatch = useDispatch();
-
+  console.log(window.location.href)
   const { categoryId, sort, currentPage, searchValue } = useSelector((state) => state.filter);
   const { items, status } = useSelector((state) => state.pizza);
   const sortType = sort.sortProperty;

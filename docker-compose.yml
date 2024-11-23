@@ -1,0 +1,28 @@
+# Сборка контейнеров: docker compose up --build
+networks:
+  dev:
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - './nginx.conf:/etc/nginx/nginx.conf'
+    depends_on:
+     - pizza-back
+     - pizza-front
+    networks:
+      dev:
+
+  pizza-back:
+    build:
+      context: ./pizza-back
+    networks:
+      dev:
+
+  pizza-front:
+    build:
+      context: ./pizza-front
+    networks:
+      dev:
