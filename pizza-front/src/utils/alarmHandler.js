@@ -47,7 +47,6 @@ export const showError = (error) => {
 };
 
 export const errorHandler = (error) => {
-  console.log(error)
   try {
     const errorText = error.response.data.detail;
     alarmHandler(`${errorText}`, 'error', '');
