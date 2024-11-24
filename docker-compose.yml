@@ -18,6 +18,13 @@ services:
   pizza-back:
     build:
       context: ./pizza-back
+    ports:
+      - "31112:5000"
+    working_dir: /app
+    volumes:
+      - type: bind
+        source: ./pizza-back/src
+        target: /app
     networks:
       dev:
 
