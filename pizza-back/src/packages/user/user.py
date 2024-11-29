@@ -65,3 +65,16 @@ class User(Object):
         await self.db_conn.commit()
 
         return {"success": True}
+
+    async def new_order(self, user_id: int, order: str):
+        """Добавить запись в историю заказов пользователя."""
+
+        stmt = f"""
+            INSERT INTO orders (user_id, order_value)
+            VALUES (:user_id, :order)
+        """
+
+        await self.db_conn.execute(text(stmt), {"user_id": user_id, "order": order})
+        await self.db_conn.commit()
+
+        return {"success": True}

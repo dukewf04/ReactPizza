@@ -5,7 +5,12 @@ from packages.database import get_db_connect
 from packages.user.user import User
 from packages.auth.auth import Auth
 
-from chemas.user import UserProfileAttribute, UserDeleteAttribute, UserPatchAttribute
+from chemas.user import (
+    UserProfileAttribute,
+    UserDeleteAttribute,
+    UserPatchAttribute,
+    UserAddOrder,
+)
 
 worker = APIRouter()
 
@@ -51,5 +56,17 @@ async def patch_user(
 
     user = User(db_conn)
     result = await user.patch_user(attr=attr)
+
+    return result
+
+
+@worker.post("/order")
+async def new_order(
+    attr: UserAddOrder, db_conn: AsyncConnection = Depends(get_db_connect)
+):
+    """Добавить запись в историю заказов пользователя."""
+
+    user = User(db_conn)
+    result = await user.new_order(user_id=attr.user_id, order=attr.order)
 
     return result

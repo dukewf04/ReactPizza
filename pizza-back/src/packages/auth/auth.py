@@ -47,7 +47,9 @@ class Auth(Object):
         )
         return encode_jwt
 
-    async def find_one_or_none(self, user_id: int = None, email: str = None):
+    async def find_one_or_none(
+        self, user_id: int = None, email: str = None, orders: bool = False
+    ):
         """Проверка на существование пользователя в базе. Ищем по email если user_id не передан"""
 
         stmt = f"""
@@ -57,9 +59,26 @@ class Auth(Object):
         """
 
         attr = {"user_id": user_id, "email": email}
-        result = await self.select(text(stmt), attr)
+        result_user = await self.select(text(stmt), attr)
 
-        return result[0]._asdict() if result else None
+        if not result_user:
+            return None
+
+        # Если запрашиваем данные об заказе
+        result_orders = None
+        if orders:
+            stmt = f"""
+                SELECT order_value, order_date 
+                FROM orders
+                WHERE user_id = :user_id
+            """
+            result_orders = await self.select(text(stmt), attr)
+
+        result: dict = result_user[0]._asdict()
+        if result_orders:
+            result.update({"orders": [el._asdict() for el in result_orders]})
+
+        return result
 
     async def register_user(self, attr: RegisterAttribute):
         """Регистрация пользователя."""
@@ -80,7 +99,6 @@ class Auth(Object):
         """
 
         attr["password"] = self.get_password_hash(attr["password"])
-        attr["avatar"] = self.user_data["avatar"].encode("utf-8")
         await self.db_conn.execute(text(stmt), attr)
         await self.db_conn.commit()
         user = await self.find_one_or_none(email=attr.get("email"))
@@ -146,7 +164,9 @@ class Auth(Object):
                 detail="Не найден ID пользователя",
             )
 
-        user = await self.find_one_or_none(int(user_id))
+        user = await self.find_one_or_none(
+            int(user_id), orders=bool(request.query_params.get("orders"))
+        )
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

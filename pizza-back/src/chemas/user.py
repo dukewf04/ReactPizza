@@ -57,3 +57,24 @@ class UserPatchAttribute(BaseModel):
             )
 
         return values
+
+
+class UserAddOrder(BaseModel):
+    """Атрибуты добавления пиццы."""
+
+    user_id: int
+    order: str
+
+    @root_validator(pre=True)
+    def pre_validator(cls, values):
+        attrs = values.keys()
+
+        if "user_id" not in attrs or not values.get("user_id"):
+            raise HTTPException(
+                status_code=400, detail="Не указан индентификатор пользователя"
+            )
+
+        if "order" not in attrs or not values.get("order"):
+            raise HTTPException(status_code=400, detail="Не переданы данные о заказе")
+
+        return values

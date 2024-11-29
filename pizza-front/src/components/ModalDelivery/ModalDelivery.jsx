@@ -4,7 +4,8 @@ import useState from 'react-usestateref';
 import UserAuth from '../../services/userAuth/userAuth';
 import axios from 'axios';
 import { BASE_URL } from '../../config/global';
-import { successHandler } from '../../utils/alarmHandler';
+import { showError, successHandler } from '../../utils/alarmHandler';
+import { useSelector } from 'react-redux';
 
 // Оформление доставки
 const ModalDelivery = ({ showModal, setShowModal }) => {
@@ -21,6 +22,7 @@ const ModalDelivery = ({ showModal, setShowModal }) => {
     address: true,
     phone: true,
   });
+  const { items } = useSelector((state) => state.cart);
 
   const errorNotification = 'поле обязательно к заполнению';
 
@@ -34,8 +36,27 @@ const ModalDelivery = ({ showModal, setShowModal }) => {
     }
 
     if (Object.values(fieldsValidRef.current).every((d) => d)) {
-      successHandler('Заказ успешно оформлен!');
-      setShowModal(false);
+      const data = {
+        user_id: userData.user_id,
+        order: JSON.stringify(
+          items.map((item) => {
+            const { id, image, price, ...rest } = item;
+            return rest;
+          }),
+        ),
+      };
+      axios
+        .post(`${BASE_URL}order`, data, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then((res) => {
+          successHandler('Заказ успешно оформлен!');
+        })
+        .catch((error) => {
+          showError('Ошибка при оформлении заказа. Попробуйте еще раз.');
+        });
     }
   };
 

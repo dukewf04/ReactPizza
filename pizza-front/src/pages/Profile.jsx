@@ -10,6 +10,7 @@ import { IconButton } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import ProfileInputField from '../components/ProfileInputField';
+import { formatDate } from '../utils/formatDate';
 
 export const editableFieldColor = '#f0f0f0';
 
@@ -82,7 +83,7 @@ const Profile = () => {
     window.scrollTo(0, 0);
     setIsFetching(true);
     axios
-      .get(`${BASE_URL}user_info?user_id=${Number(userId)}`)
+      .get(`${BASE_URL}user_info?user_id=${Number(userId)}&orders=true`)
       .then((res) => {
         setUserData(res.data);
       })
@@ -218,8 +219,26 @@ const Profile = () => {
         <div className="profile--main__card text-muted">
           <div className="mb-3">История заказов</div>
           <hr />
-          <div>
-            <i style={{ fontSize: '15px' }}>Заказов не было...</i>
+          <div style={{maxHeight: '600px', overflow: 'auto'}}>
+            {!userData.orders ? (
+              <i style={{ fontSize: '15px' }}>Заказов не было...</i>
+            ) : (
+              <pre>
+                {userData.orders.map((order) => (
+                  <Row key={order.order_date}>
+                    <Col sm={4}>{formatDate(order.order_date)}</Col>
+                    <Col sm={8}>
+                      {JSON.parse(order.order_value).map((val, i) => (
+                        <div key={i}>
+                          {val.title} - {val.type} - {val.count} шт.
+                        </div>
+                      ))}
+                    </Col>
+                    <hr className="mt-1" />
+                  </Row>
+                ))}
+              </pre>
+            )}
           </div>
         </div>
 

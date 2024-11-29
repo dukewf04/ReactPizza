@@ -29,28 +29,7 @@ const NAVIGATION = [
   },
   {
     kind: 'divider',
-  },
-  {
-    kind: 'header',
-    title: 'Аналитика',
-  },
-  {
-    segment: 'reports',
-    title: 'Отчеты',
-    icon: <BarChartIcon />,
-    children: [
-      {
-        segment: 'sales',
-        title: 'Продажи',
-        icon: <DescriptionIcon />,
-      },
-      {
-        segment: 'traffic',
-        title: 'Трафик',
-        icon: <DescriptionIcon />,
-      },
-    ],
-  },
+  }
 ];
 
 const demoTheme = extendTheme({
