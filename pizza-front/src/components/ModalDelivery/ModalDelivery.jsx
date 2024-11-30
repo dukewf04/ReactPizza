@@ -40,7 +40,7 @@ const ModalDelivery = ({ showModal, setShowModal }) => {
         user_id: userData.user_id,
         order: JSON.stringify(
           items.map((item) => {
-            const { id, image, price, ...rest } = item;
+            const { id, image, ...rest } = item;
             return rest;
           }),
         ),

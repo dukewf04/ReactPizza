@@ -1,3 +1,6 @@
+import json
+import math
+
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncConnection
 from packages.object import Object
@@ -67,14 +70,26 @@ class User(Object):
         return {"success": True}
 
     async def new_order(self, user_id: int, order: str):
-        """Добавить запись в историю заказов пользователя."""
+        """Добавить запись в историю заказов пользователя. Начислить бонусы за покупку."""
 
+        # Обновляем журнал покупок
         stmt = f"""
             INSERT INTO orders (user_id, order_value)
-            VALUES (:user_id, :order)
+            VALUES (:user_id, :order)     
         """
 
         await self.db_conn.execute(text(stmt), {"user_id": user_id, "order": order})
+        await self.db_conn.commit()
+
+        # Добавляем бонусы за покупку
+        percent = math.ceil(sum(list(map(lambda x: int(x["price"]), json.loads(order))))*0.01)
+        stmt = f"""
+            UPDATE users
+            SET bonus = bonus + :percent
+            WHERE user_id = :user_id       
+        """
+
+        await self.db_conn.execute(text(stmt), {"user_id": user_id, "percent": percent})
         await self.db_conn.commit()
 
         return {"success": True}

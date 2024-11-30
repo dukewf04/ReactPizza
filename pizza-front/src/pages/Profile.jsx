@@ -5,10 +5,6 @@ import UserAuth from '../services/userAuth/userAuth';
 import { errorHandler, showError, successHandler } from '../utils/alarmHandler';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../config/global';
-import EditIcon from '@mui/icons-material/Edit';
-import { IconButton } from '@mui/material';
-import SaveIcon from '@mui/icons-material/Save';
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import ProfileInputField from '../components/ProfileInputField';
 import { formatDate } from '../utils/formatDate';
 
@@ -22,6 +18,8 @@ const Profile = () => {
     advertising: false,
     promotions: false,
   });
+  const advertisingRef = useRef(null);
+  const promotionsRef = useRef(null);
   const [base64Image, setBase64Image] = useState(null);
   const navigate = useNavigate();
 
@@ -52,12 +50,16 @@ const Profile = () => {
   };
 
   // Изменение подписок на рекламу, акции
-  const handleChangeNotification = async (name, value) => {
+  const handleChangeNotification = async (name) => {
     setIsSavingNotification((prev) => ({ ...prev, [name]: true }));
+    const dataNotification = {
+      advertising: advertisingRef.current.checked,
+      promotions: promotionsRef.current.checked,
+    };
     axios
       .patch(
         `${BASE_URL}user`,
-        { user_id: userData.user_id, notification: { ...userData.notification, [name]: value } },
+        { user_id: userData.user_id, notification: dataNotification },
         {
           headers: {
             'Content-Type': 'application/json',
@@ -219,7 +221,7 @@ const Profile = () => {
         <div className="profile--main__card text-muted">
           <div className="mb-3">История заказов</div>
           <hr />
-          <div style={{maxHeight: '600px', overflow: 'auto'}}>
+          <div style={{ maxHeight: '600px', overflow: 'auto' }}>
             {!userData.orders ? (
               <i style={{ fontSize: '15px' }}>Заказов не было...</i>
             ) : (
@@ -280,11 +282,12 @@ const Profile = () => {
                     Рекламаные рассылки
                   </Form.Label>
                   <Form.Check
+                    ref={advertisingRef}
                     type="switch"
                     id="advertising-switch"
                     defaultChecked={userData.notification?.advertising}
                     disabled={isSavingNotification.advertising}
-                    onClick={(e) => handleChangeNotification('advertising', e.target.checked)}
+                    onClick={(e) => handleChangeNotification('advertising')}
                   />
                   {isSavingNotification.advertising && (
                     <Spinner animation="border" variant="primary" size="sm" />
@@ -300,11 +303,12 @@ const Profile = () => {
                     Акции компании
                   </Form.Label>
                   <Form.Check
+                    ref={promotionsRef}
                     type="switch"
                     id="promotions-switch"
                     defaultChecked={userData.notification?.promotions}
                     disabled={isSavingNotification.promotions}
-                    onClick={(e) => handleChangeNotification('promotions', e.target.checked)}
+                    onClick={(e) => handleChangeNotification('promotions')}
                   />
                   {isSavingNotification.promotions && (
                     <Spinner animation="border" variant="primary" size="sm" />
